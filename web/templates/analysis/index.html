@@ -43,8 +43,11 @@
                     <th width="10%">Timestamp</th>
                     <th width="10%">Machine</th>
                     <th width="8%">Package</th>
-                    <th width="33%">Filename</th>
+                    <th width="20%">Filename</th>
                     <th width="18%">MD5</th>
+                    {% if config.ml_detection %}
+                    <th width="7%">ML Detection</th>
+                    {% endif %}
                     <th width="7%">Detections</th>
 
                     {% if config.display_task_tags %}
@@ -130,6 +133,26 @@
                                 <span class="mono">{{analysis.sample.md5}}</span>
                             {% endif %}
                         </td>
+                        {% if config.ml_detection %} 
+                        <td>
+                                {% with ml_keys=analysis.ml_detection.keys %}
+                                    {% for first_key in ml_keys|slice:":1" %}
+                                        {% if forloop.first %}
+                                            <!--取一个中间变量-->
+                                            {% with ml_detection=analysis.ml_detection|get_item:first_key %}
+                                                {% if ml_detection|get_item:'class' == "malicious" %}
+                                                    <span style ="color:red;font-weight: bold;">{{ml_detection|get_item:'class'}}</span>
+                                                {% elif ml_detection|get_item:'class' == "clean" %}
+                                                    <span style="color:greenyellow;font-weight: bold;">{{ml_detection|get_item:'class'}}</span>
+                                                {% else %}
+                                                    <span style="color:gray;font-weight: bold;">{{ml_detection|get_item:'class'}}</span>
+                                                {% endif %}
+                                            {% endwith %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endwith %}
+                        </td>
+                        {% endif %}
                         <td>
                             {% if analysis.detections|is_string %}
                                 <a href="/analysis/search/detections:{{analysis.detections}}"><span style="color:#EE1B2F;font-weight: bold;">{{analysis.detections}}</span></a>
@@ -169,7 +192,7 @@
                             <span class="mono">
                             {% if analysis.f_mlist_cnt %}
                             {{analysis.f_mlist_cnt}}
-                            {% else %}
+                            {% else %}https://github.com/kevoreilly/CAPEv2.git
                             None
                             {% endif %}
                             </span>

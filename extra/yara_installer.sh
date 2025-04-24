@@ -5,7 +5,7 @@ set -ex
 # cd /opt/CAPEv2/ ; sudo -u cape /etc/poetry/bin/poetry run extra/yara_installer.sh
 
 if [ ! -d /tmp/yara-python ]; then
-    git clone --recursive https://github.com/VirusTotal/yara-python /tmp/yara-python
+    git clone --recursive https://ghfast.top/https://github.com/VirusTotal/yara-python /tmp/yara-python
 fi
 
 cd /tmp/yara-python

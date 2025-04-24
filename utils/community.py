@@ -35,16 +35,16 @@ log = logging.getLogger(__name__)
 
 def flare_capa(proxy=None):
     signature_urls = (
-        "https://github.com/mandiant/capa/raw/master/sigs/1_flare_msvc_rtf_32_64.sig",
-        "https://github.com/mandiant/capa/raw/master/sigs/2_flare_msvc_atlmfc_32_64.sig",
-        "https://github.com/mandiant/capa/raw/master/sigs/3_flare_common_libs.sig",
+        "https://ghfast.top/https://github.com/mandiant/capa/raw/master/sigs/1_flare_msvc_rtf_32_64.sig",
+        "https://ghfast.top/https://github.com/mandiant/capa/raw/master/sigs/2_flare_msvc_atlmfc_32_64.sig",
+        "https://ghfast.top/https://github.com/mandiant/capa/raw/master/sigs/3_flare_common_libs.sig",
     )
     try:
         if proxy:
             http = urllib3.ProxyManager(proxy)
         else:
             http = urllib3.PoolManager()
-        data = http.request("GET", "https://github.com/mandiant/capa-rules/archive/master.zip").data
+        data = http.request("GET", "https://ghfast.top/https://github.com/mandiant/capa-rules/archive/master.zip").data
         dest_folder = os.path.join(CUCKOO_ROOT, "data")
         shutil.rmtree((os.path.join(dest_folder, "capa-rules-master")), ignore_errors=True)
         shutil.rmtree((os.path.join(dest_folder, "capa-rules")), ignore_errors=True)
@@ -69,6 +69,7 @@ def flare_capa(proxy=None):
 
 
 def install(enabled, force, rewrite, clean=False, filepath: str = False, access_token=None, proxy=False, url: str = False):
+    print(filepath)
     if filepath and path_exists(filepath):
         t = tarfile.TarFile.open(filepath, mode="r:gz")
     else:
@@ -239,6 +240,7 @@ def main():
     )
 
     args = parser.parse_args()
+    print("parse all")
 
     enabled = []
 
@@ -303,7 +305,7 @@ def main():
         print(colors.red("You need to enable a category!\n"))
         parser.print_help()
         return
-
+    print("start install")
     install(
         enabled,
         args.force,
@@ -312,7 +314,7 @@ def main():
         args.file,
         args.token,
         args.proxy,
-        args.url or f"https://github.com/kevoreilly/community/archive/{args.branch}.tar.gz",
+        args.url or f"https://ghfast.top/https://github.com/kevoreilly/community/archive/{args.branch}.tar.gz",
     )
 
 

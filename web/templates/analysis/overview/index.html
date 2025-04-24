@@ -1,6 +1,41 @@
 {% load key_tags %}
 {% include "analysis/overview/_info.html" %}
-<hr />
+{% if analysis.ml_detection %}
+    <h4>Machine Learning Detection</h4>
+    <!--根据ml_dectection的项数选择宽度-->
+    
+    <table class="table table-striped table-bordered" style="width: {{ analysis.ml_detection|length|floatformat:0 }}%;">
+        <tr>
+            {%for key, value in analysis.ml_detection.items %}
+                <th style="width: 10%;">{{ key }}</th>
+            {% endfor %}
+        </tr>
+        <tr>
+            {%for key, value in analysis.ml_detection.items %}
+            {% for k, v in value.items %}
+                    {% if forloop.first %}
+                        {% if v == "malicious" %}
+                            <td style="width: 10%; background-color: red;">
+                        {% elif v == "clean" %}
+                            <td style="width: 10%; background-color: greenyellow;">
+                        {% elif v == "danger" %}
+                            <td style="width: 10%; background-color: gray;">
+                        {% else %}
+                            <td style="width: 10%; background-color: #e9ecef;">
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+                {% for k, v in value.items %}
+                    <!--文字颜色为黑色-->
+                    <span style="color: black;">{{ v }} </span>
+                    {% if not forloop.last %}
+                        <br>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            {% endfor %}
+    </table>
+{% endif %}
 {% if analysis.malware_conf %}
     {% for config_block in analysis.malware_conf %}
         {% for family, config in config_block.items %}
@@ -120,6 +155,7 @@
 {% include "analysis/overview/_signatures.html" %}
 
 {% include "analysis/overview/_screenshots.html" %}
+
 {% if config.guacamole %}
     {% include "analysis/overview/_playback.html" %}
 {% endif %}

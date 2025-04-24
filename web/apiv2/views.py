@@ -876,7 +876,6 @@ def tasks_list(request, offset=None, limit=None, window=None):
             if task.get("target"):
                 task["target"] = convert_to_printable(task["target"])
 
-            resp["data"].append(task)
 
     return Response(resp)
 
@@ -950,6 +949,7 @@ def tasks_view(request, task_id):
                 "suri_file_cnt": 1,
                 "trid": 1,
                 "_id": 0,
+                "ml_detection": 1,
             },
             sort=[("_id", -1)],
         )
@@ -973,6 +973,7 @@ def tasks_view(request, task_id):
                 "suri_http_cnt",
                 "suri_file_cnt",
                 "trid",
+                "ml_detection",
             ],
         )["hits"]["hits"]
         if len(rtmp) > 1:
@@ -995,6 +996,7 @@ def tasks_view(request, task_id):
             "mlist_cnt",
             "f_mlist_cnt",
             "malscore",
+            "ml_detection",
         ):
             if keyword in rtmp:
                 entry[keyword] = rtmp[keyword]

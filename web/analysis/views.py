@@ -246,6 +246,7 @@ def get_analysis_info(db, id=-1, task=None):
                 "suri_file_cnt": 1,
                 "trid": 1,
                 "_id": 0,
+                "ml_detection": 1,
             },
             sort=[("_id", -1)],
         )
@@ -269,6 +270,7 @@ def get_analysis_info(db, id=-1, task=None):
                 "suri_http_cnt",
                 "suri_file_cnt",
                 "trid",
+                "ml_detection",
             ],
         )["hits"]["hits"]
         if len(rtmp) > 1:
@@ -290,6 +292,7 @@ def get_analysis_info(db, id=-1, task=None):
             "mlist_cnt",
             "f_mlist_cnt",
             "malscore",
+            "ml_detection",
         ):
             if keyword in rtmp:
                 new[keyword] = rtmp[keyword]
@@ -2658,3 +2661,29 @@ def reprocess_task(request, task_id: int):
         return render(request, "error.html", {"error": msg})
     else:
         return HttpResponseRedirect(request.META.get("HTTP_REFERER", "/"))
+
+
+@require_safe
+@conditional_login_required(login_required, settings.WEB_AUTHENTICATION)
+@ratelimit(key="ip", rate=my_rate_seconds, block=rateblock)
+@ratelimit(key="ip", rate=my_rate_minutes, block=rateblock)
+def ml_detection_detail(request, task_id):
+    """Show detailed ML detection parameters for a specific analysis."""
+    if enabledconf["mongodb"]:
+        analysis = mongo_find_one(
+            "analysis", {"info.id": int(task_id)}, {"ml_detection": 1, "info": 1, "_id": 0}, sort=[("_id", -1)]
+        )
+    elif es_as_db:
+        query = es.search(
+            index=get_analysis_index(),
+            query=get_query_by_info_id(task_id),
+            _source=["ml_detection", "info"],
+        )["hits"]["hits"]
+        if query:
+            analysis = query[0]["_source"]
+        else:
+            analysis = None
+    else:
+        analysis = None
+
+    return render(request, "analysis/ml_detection.html", {"analysis": analysis})

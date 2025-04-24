@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
 
 <div class="alert alert-primary" style="text-align: center;font-size: 22px; color: white;">
     Estimating ~<b>{{report.estimate_hour}}</b> analysis per hour, <b>{{report.estimate_day}}</b> per day.
@@ -54,4 +55,94 @@
         </tbody>
     </table>
 </div>
+
+<!-- ML Detection Daily Statistics Chart -->
+<div class="section-title">
+    <h4>ML Detection Daily Statistics</h4>
+</div>
+<div class="card card-body">
+    <div id="ml_detection_chart" style="width: 100%;height:400px;"></div>
+</div>
+
+<script type="text/javascript">
+  // 基于准备好的dom，初始化echarts实例
+  var mlChart = echarts.init(document.getElementById('ml_detection_chart'));
+
+  // ML Detection data
+  var mlData = {{ report.ml_detection_stats|safe }};
+  
+  // 指定图表的配置项和数据
+  var mlOption = {
+    title: {
+      text: 'ML Detection Results (Last 7 Days)'
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow'
+      }
+    },
+    legend: {
+      data: ['Malicious', 'Clean', 'Other']
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'category',
+      data: mlData.dates
+    },
+    yAxis: {
+      type: 'value'
+    },
+    series: [
+      {
+        name: 'Malicious',
+        type: 'bar',
+        stack: 'total',
+        itemStyle: {
+          color: '#c23531'
+        },
+        data: mlData.malicious
+      },
+      {
+        name: 'Clean',
+        type: 'bar',
+        stack: 'total',
+        itemStyle: {
+          color: '#91c7ae'
+        },
+        data: mlData.clean
+      },
+      {
+        name: 'Other',
+        type: 'bar',
+        stack: 'total',
+        itemStyle: {
+          color: '#d48265'
+        },
+        data: mlData.other
+      }
+    ]
+  };
+
+  // Configure click events to show details
+  mlChart.on('click', function(params) {
+    // When a bar is clicked, redirect to search page filtered by date and ML detection
+    var date = params.name;
+    window.location.href = "/analysis"
+  });
+
+  // 使用刚指定的配置项和数据显示图表。
+  mlChart.setOption(mlOption);
+  
+  // Make chart responsive
+  window.addEventListener('resize', function() {
+    mlChart.resize();
+  });
+</script>
+
 {% endblock %}

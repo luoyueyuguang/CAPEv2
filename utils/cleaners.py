@@ -72,9 +72,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "-drs",
         "--delete-range",
+        type=str,
         help="Delete jobs in range. Ex 1-5",
         action="store",
         required=False,
+        # This is a string, not a list
     )
     parser.add_argument(
         "-ddc",

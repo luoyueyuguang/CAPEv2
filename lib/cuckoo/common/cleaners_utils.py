@@ -218,7 +218,6 @@ def is_reporting_db_connected():
         log.error("Can't connect to reporting db %s", str(e))
         return False
 
-
 def delete_bulk_tasks_n_folders(ids: list, delete_mongo: bool, delete_db_tasks=False):
     for i in range(0, len(ids), 10):
         ids_tmp = ids[i : i + 10]
@@ -621,7 +620,7 @@ def cuckoo_clean_pending_tasks(timerange: str = None, delete: bool = False):
         resolver_pool.map(lambda tid: fail_job(pending_tasks), pending_tasks)
 
 
-def cuckoo_clean_range_tasks(range):
+def cuckoo_clean_range_tasks(range:str):
     """Clean up tasks between range: 1-5
     It deletes all stored data from file system and configured databases (SQL
     and MongoDB for selected tasks.
@@ -744,7 +743,7 @@ def execute_cleanup(args: dict, init_log=True):
         cuckoo_clean_lower_score(args["malscore"])
 
     if args.get("delete_range"):
-        cuckoo_clean_range_tasks(args["time_range"])
+        cuckoo_clean_range_tasks(args["delete_range"])
 
     if args.get("deduplicated_cluster_queue"):
         cuckoo_dedup_cluster_queue()
